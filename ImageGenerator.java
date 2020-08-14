@@ -15,7 +15,7 @@ public class ImageGenerator {
             for (int j = 0; j < height; j++) {
                 int curIndex = indexes.get(pixelIndex);
                 Color curCol = new Color(ColorTable[curIndex][0], ColorTable[curIndex][1], ColorTable[curIndex][2]);
-                img.setRGB(j, i, curCol.getRGB());
+                img.setRGB(i, j, curCol.getRGB());
                 pixelIndex++;
             }
         }
