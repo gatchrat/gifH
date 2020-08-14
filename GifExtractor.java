@@ -127,8 +127,8 @@ public class GifExtractor {
             }
             byteIndex = byteIndex +imageData.length;
 
-           //decoder.Decode(initCode,new byte[] {(byte)0x8F,(byte)0x8C});
-           ArrayList<Integer> indexList = decoder.Decode(initCode, imageData);
+           //decoder.Decode(initCode,new byte[] {(byte)0x18,(byte)0x8C});
+           ArrayList<Integer> indexList = decoder.Decode(initCode, imageData,GlobalColorTable.length);
            System.out.println("Extracted "+indexList.size() +" indexes");
            ImageGenerator img = new ImageGenerator(GlobalColorTable, width, height, indexList);
            //REPEAT BLOCKS TILL END
