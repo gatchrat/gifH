@@ -57,14 +57,15 @@ public class GifExtractor {
             while (gif[byteIndex] != 0x2c) {
                 byteIndex++;
             }
+            byteIndex++;
             // IMAGE DESCRIPTOR
             // 2 byte left pos
             byteIndex += 2;
             // 2 byte right pos
             byteIndex += 2;
-            int localWidth = ((gif[byteIndex] & 0xff) << 8) | (gif[byteIndex + 1] & 0xff);
+            int localWidth = ((gif[byteIndex+1] & 0xff) << 8) | (gif[byteIndex ] & 0xff);
             byteIndex += 2;
-            int localHeight = ((gif[byteIndex] & 0xff) << 8) | (gif[byteIndex + 1] & 0xff);
+            int localHeight = ((gif[byteIndex+1] & 0xff) << 8) | (gif[byteIndex ] & 0xff);
             byteIndex += 2;
             System.out.println("Cur. Image is " + localWidth + "x" + localHeight);
             // bits
@@ -111,7 +112,6 @@ public class GifExtractor {
                     }
                 }
             }
-            byteIndex++;
             // IMAGE DATA
             LZWDecoder decoder = new LZWDecoder();
             int initCode = gif[byteIndex];
