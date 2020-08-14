@@ -11,11 +11,11 @@ public class ImageGenerator {
     public ImageGenerator(int[][] ColorTable, int width, int height, ArrayList<Integer> indexes) {
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         int pixelIndex = 0;
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j <width ; j++) {
                 int curIndex = indexes.get(pixelIndex);
                 Color curCol = new Color(ColorTable[curIndex][0], ColorTable[curIndex][1], ColorTable[curIndex][2]);
-                img.setRGB(i, j, curCol.getRGB());
+                img.setRGB(j, i, curCol.getRGB());
                 pixelIndex++;
             }
         }
