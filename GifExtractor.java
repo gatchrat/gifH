@@ -4,7 +4,7 @@ import java.util.BitSet;
 public class GifExtractor {
     public GifExtractor(byte[] gif) {
         // HEAD
-        
+
         if (checkIfValidGif(gif)) {
             System.out.println("The Version is:" + (char) gif[3] + (char) gif[4] + (char) gif[5]);
             int width = ((gif[7] & 0xff) << 8) | (gif[6] & 0xff);
@@ -42,16 +42,14 @@ public class GifExtractor {
                 globalTableSize = 3 * (int) Math.pow(2, globalTableSize + 1);
                 System.out.println("Eine Globale Farbentabelle mit " + globalTableSize + " bytes wird genutzt");
             }
-            //Skippe noch 2 bytes wegen unwichtige info
+            // Skippe noch 2 bytes wegen unwichtige info
             int byteIndex = 13;
             // GLOBAL COLOR TABLE
-            
-            
-            
-            int[][] GlobalColorTable = new int[globalTableSize/3][3];
-            for (int i = 0; i < globalTableSize/3; i++) {
+
+            int[][] GlobalColorTable = new int[globalTableSize / 3][3];
+            for (int i = 0; i < globalTableSize / 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    GlobalColorTable[i][j] = gif[byteIndex]  & 0xFF;
+                    GlobalColorTable[i][j] = gif[byteIndex] & 0xFF;
                     byteIndex++;
                 }
             }
@@ -76,7 +74,7 @@ public class GifExtractor {
             boolean interlace = false;
             if (imageDescriptor.get(7 - 0)) {
                 localTable = true;
-               
+
             }
             if (imageDescriptor.get(7 - 1)) {
                 interlace = true;
@@ -98,15 +96,15 @@ public class GifExtractor {
                 colorSize += 1;
             }
 
-            if(localTable){
+            if (localTable) {
                 colorSize = 3 * (int) Math.pow(2, colorSize + 1);
                 System.out.println("A Local Color Table with " + colorSize + " bytes is being used");
             }
             // LOCAL COLOR TABLE
-            if(colorSize != 0){
+            if (colorSize != 0) {
                 int[][] LocalColorTable = new int[colorSize][3];
-            
-                for (int i = 0; i < colorSize/3; i++) {
+
+                for (int i = 0; i < colorSize / 3; i++) {
                     for (int j = 0; j < 3; j++) {
                         LocalColorTable[i][j] = gif[byteIndex];
                         byteIndex++;
@@ -114,28 +112,44 @@ public class GifExtractor {
                 }
             }
             byteIndex++;
-           //IMAGE DATA
+            // IMAGE DATA
             LZWDecoder decoder = new LZWDecoder();
             int initCode = gif[byteIndex];
             byteIndex++;
-            
-            //blocksize gucken
-            byte[] imageData = new byte[gif[byteIndex]];
-            byteIndex++;
-            for (int i = 0; i < imageData.length; i++) {
-                imageData[i] = gif[byteIndex+imageData.length-1-i];
+            ArrayList<Integer> indexList = new ArrayList<Integer>();
+            //count bytes
+            int size = 0;
+            int oldIndex = byteIndex;
+            while (gif[byteIndex] != 0) {
+                size += gif[byteIndex] & 0xff;
+                byteIndex += gif[byteIndex] & 0xff;
+                byteIndex++;
             }
-            byteIndex = byteIndex +imageData.length;
+            byteIndex = oldIndex;
 
-           //decoder.Decode(initCode,new byte[] {(byte)0x18,(byte)0x8C});
-           ArrayList<Integer> indexList = decoder.Decode(initCode, imageData,GlobalColorTable.length);
-           System.out.println("Extracted "+indexList.size() +" indexes");
-           ImageGenerator img = new ImageGenerator(GlobalColorTable, width, height, indexList);
-           //REPEAT BLOCKS TILL END
+            System.out.println("Image Date is " + size + "bytes");
+            byte[] imageData = new byte[size];
+            int index = 0;
+            while (gif[byteIndex] != 0) {
+                // blocksize gucken
+                int curSize = gif[byteIndex] & 0xff;
+                
+                byteIndex++;
+                for (int i = 0; i <curSize; i++) {
+                    imageData[index] = gif[byteIndex + i];
+                    index++;
+                }
+                
+                byteIndex = byteIndex + curSize;
+            }
+            imageData = Util.reverseByteArray(imageData);
+            indexList.addAll(  decoder.Decode(initCode, imageData, GlobalColorTable.length));
+                System.out.println("Extracted " + indexList.size() + " indexes");
+            ImageGenerator img = new ImageGenerator(GlobalColorTable, width, height, indexList);
+            // REPEAT BLOCKS TILL END
 
-           //END
-        } 
-        else {
+            // END
+        } else {
             System.out.println("This doesnt seem to be a valid file");
         }
     }

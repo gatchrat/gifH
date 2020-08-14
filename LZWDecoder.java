@@ -36,7 +36,6 @@ public class LZWDecoder {
         codeTable.get(codeTable.size()-1).add(resetCode);
         codeTable.add(new ArrayList<Integer>());
         codeTable.get(codeTable.size()-1).add(endCode);
-        System.out.println("C " + codeTable.size());
         ByteBuffer bb = ByteBuffer.wrap(value);
           BitSet dBits = BitSet.valueOf(bb);
         // init
@@ -56,7 +55,7 @@ public class LZWDecoder {
             }
 
         }
-        //System.out.println("reset:" + curCode);
+        System.out.println("reset:" + curCode);
         int prevCode = 0;
         prevCode = curCode;
         
@@ -65,8 +64,6 @@ public class LZWDecoder {
 
         for (int i = 0; i < codeSize; i++) {
             boolean curBit = dBits.get(bits - (byteIndex * 8 + 8 - bitOffset));
-            // System.out.println(dBits.length() - (byteIndex * 8 + 8 - bitOffset));
-            System.out.println(curBit);
             bitOffset++;
             if (bitOffset == 8) {
                 bitOffset = 0;
@@ -85,7 +82,7 @@ public class LZWDecoder {
         prevCode = curCode;
         
         // while code reading
-        while (byteIndex < value.length) {
+        while (byteIndex < value.length-1) {
 
             // read code
             curCode = 0;
@@ -95,13 +92,14 @@ public class LZWDecoder {
                 if (bitOffset == 8) {
                     bitOffset = 0;
                     byteIndex++;
+                    System.out.println(byteIndex);
                 }
                 if (curBit) {
                     curCode += Math.pow(2, i);
                 }
             }
             // handle code
-            System.out.println(curCode);
+            //System.out.println(curCode);
             if (curCode == resetCode) {
                 System.out.println("Found Reset");
                 byteIndex = 0;
@@ -133,7 +131,7 @@ public class LZWDecoder {
 
                 if (codeTable.size() - 1 == Math.pow(2, codeSize) - 1) {
                     codeSize++;
-                    // System.out.println("CodeSize:" + codeSize);
+                     System.out.println("CodeSize:" + codeSize);
                 }
                 prevCode = curCode;
                 /*
