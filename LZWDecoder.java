@@ -163,6 +163,7 @@ public class LZWDecoder {
                 //System.out.println("Table size:" + codeTable.size());
                 //System.out.println("List fold size:" + codeList.size());
                 byteIndex = 999999;
+                System.out.println("Encountered ending Code");
             }
         }
         ArrayList<Integer> finalList = new ArrayList<Integer>();

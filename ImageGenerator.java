@@ -19,6 +19,11 @@ public class ImageGenerator {
                 Color curCol = new Color(ColorTable[curIndex][0], ColorTable[curIndex][1], ColorTable[curIndex][2]);
                 img.setRGB(j, i, curCol.getRGB());
                 pixelIndex++;
+                if(pixelIndex == indexes.size() && pixelIndex != width*height){
+                    j = 99999;
+                    i = 99999;
+                    System.out.println("Couldnt fully color the image");
+                }
             }
         }
         try {
