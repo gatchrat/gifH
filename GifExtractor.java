@@ -130,15 +130,16 @@ public class GifExtractor {
 
                         if (localTable) {
                             colorSize = 3 * (int) Math.pow(2, colorSize + 1);
-                            System.out.println("A Local Color Table with " + colorSize + " bytes is being used");
+                            System.out.println("A Local Color Table with " + colorSize/3 + " colors is being used");
                         }
                         // LOCAL COLOR TABLE
+                        int[][] LocalColorTable = new int[colorSize][3];
                         if (colorSize != 0) {
-                            int[][] LocalColorTable = new int[colorSize][3];
+                            
 
                             for (int i = 0; i < colorSize / 3; i++) {
                                 for (int j = 0; j < 3; j++) {
-                                    LocalColorTable[i][j] = gif[byteIndex];
+                                    LocalColorTable[i][j] = gif[byteIndex] & 0xFF;
                                     byteIndex++;
                                 }
                             }
@@ -176,7 +177,13 @@ public class GifExtractor {
                         imageData = Util.reverseByteArray(imageData);
                         indexList.addAll(decoder.Decode(initCode, imageData, GlobalColorTable.length));
                         System.out.println("Extracted " + indexList.size() + " indexes");
-                        ImageGenerator img = new ImageGenerator(GlobalColorTable, width, height, indexList,String.valueOf(imgIndex));
+                        if(localTable){
+                            ImageGenerator img = new ImageGenerator(LocalColorTable, width, height, indexList,String.valueOf(imgIndex));
+                        }
+                        else{
+                            ImageGenerator img = new ImageGenerator(GlobalColorTable, width, height, indexList,String.valueOf(imgIndex));
+                        }
+                        
                         imgIndex++;
                         break;
 
