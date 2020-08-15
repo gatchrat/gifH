@@ -97,8 +97,7 @@ public class LZWDecoder {
             // handle code
             // System.out.println(curCode);
             if (curCode == resetCode) {
-                System.out.println("Found Reset at " + byteIndex);
-                System.out.println(prevCode);
+                //System.out.println("Found Reset at " + byteIndex);
                 codeTable.clear();
                 for (int i = 0; i < tableLength; i++) {
                     codeTable.add(new ArrayList<Integer>());
@@ -128,7 +127,7 @@ public class LZWDecoder {
                     }
 
                 }
-                System.out.println("first code:" + curCode);
+                //System.out.println("first code:" + curCode);
                 codeList.add(new ArrayList<>(codeTable.get(curCode)));
                 prevCode = curCode;
                 continue;
@@ -151,28 +150,18 @@ public class LZWDecoder {
 
                 if (codeTable.size() - 1 == Math.pow(2, codeSize) - 1 && codeSize < 12) {
                     codeSize++;
-                    if (codeSize == 13) {
-                        System.out.println("Manual reset at" + byteIndex);
-                        // codeSize =initCode+1;
-                    }
-                    System.out.println("CodeSize:" + codeSize + " at " + byteIndex);
+                    //System.out.println("CodeSize:" + codeSize + " at " + byteIndex);
                 }
                 prevCode = curCode;
-                /*
-                 * for (int i = 0; i < codeTable.size(); i++) { System.out.print(i+":"); for
-                 * (int j = 0; j < codeTable.get(i).size(); j++) {
-                 * System.out.print(codeTable.get(i).get(j)); System.out.print(','); }
-                 * System.out.println(""); }
-                 */
 
             }
             if (codeTable.size() == 4096) {
-                System.out.println("full");
+                //System.out.println("full");
             }
             if (curCode == endCode) {
-                System.out.println("Found Ending Code at byte " + byteIndex);
-                System.out.println("Table size:" + codeTable.size());
-                System.out.println("List fold size:" + codeList.size());
+                //System.out.println("Found Ending Code at byte " + byteIndex);
+                //System.out.println("Table size:" + codeTable.size());
+                //System.out.println("List fold size:" + codeList.size());
                 byteIndex = 999999;
             }
         }

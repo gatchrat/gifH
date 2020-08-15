@@ -4,11 +4,13 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 
 public class ImageGenerator {
-    public ImageGenerator(int[][] ColorTable, int width, int height, ArrayList<Integer> indexes) {
+    public ImageGenerator(int[][] ColorTable, int width, int height, ArrayList<Integer> indexes,String name) {
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         int pixelIndex = 0;
         for (int i = 0; i < height; i++) {
@@ -19,9 +21,9 @@ public class ImageGenerator {
                 pixelIndex++;
             }
         }
-
-        File file = new File("myimage.png");
         try {
+            Files.createDirectories(Paths.get("extracted/"));
+            File file = new File("extracted/"+name+".png");
             ImageIO.write(img, "png", file);
             //file = new File("myimage.jpg");
             //ImageIO.write(img, "jpg", file);
