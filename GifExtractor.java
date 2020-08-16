@@ -58,6 +58,7 @@ public class GifExtractor {
             // Suche nach image descriptor gif[byteIndex] != 0x2c
             int imgIndex = 1;
             int disposalMethod = 0;
+            ImageGenerator imgG = new ImageGenerator();
             while (gif[byteIndex] != 0x3B) {
                 switch (gif[byteIndex]) {
                     case 0x21:
@@ -73,34 +74,34 @@ public class GifExtractor {
                                 boolean transparency = false;
                                 disposalMethod = 0;
                                 if (screenDescriptor.get(7 - 0)) {
-                                    //reserved
+                                    // reserved
                                 }
                                 if (screenDescriptor.get(7 - 1)) {
-                                   //reserved;
+                                    // reserved;
                                 }
                                 if (screenDescriptor.get(7 - 2)) {
-                                    //reserved
+                                    // reserved
                                 }
                                 if (screenDescriptor.get(7 - 3)) {
-                                    disposalMethod+=4;
+                                    disposalMethod += 4;
                                 }
                                 if (screenDescriptor.get(7 - 4)) {
-                                   disposalMethod+=2;
+                                    disposalMethod += 2;
                                 }
                                 if (screenDescriptor.get(7 - 5)) {
-                                   disposalMethod+=1;
+                                    disposalMethod += 1;
                                 }
                                 if (screenDescriptor.get(7 - 6)) {
-                                    //User Input
+                                    // User Input
                                 }
                                 if (screenDescriptor.get(7 - 7)) {
-                                   //transparency
-                                   transparency = true;
+                                    // transparency
+                                    transparency = true;
                                 }
                                 System.out.println(disposalMethod);
                                 byteIndex++;
                                 // delay time
-                                int delay =((gif[byteIndex+1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
+                                int delay = ((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
                                 byteIndex++;
                                 byteIndex++;
                                 // transparent color index
@@ -109,18 +110,19 @@ public class GifExtractor {
                                 byteIndex++;
                                 break;
                             case (byte) 0xff:
+                            System.out.println("A");
                                 // Application
                                 byteIndex += 14;
                                 break;
                             case (byte) 0xfe:
+                            System.out.println("C");
                                 // Comment
                                 byteIndex++;
                                 // data
-                                while (gif[byteIndex] != 0x00 || gif[byteIndex + 1] != 0x00) {
+                                while (gif[byteIndex] != 0x00 ) {
                                     byteIndex++;
                                 }
                                 // ending
-                                byteIndex++;
                                 byteIndex++;
                                 break;
 
@@ -140,7 +142,7 @@ public class GifExtractor {
                         byteIndex += 2;
                         int localHeight = ((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
                         byteIndex += 2;
-                        // System.out.println("Cur. Image is " + localWidth + "x" + localHeight);
+                        System.out.println("Cur. Image is " + localWidth + "x" + localHeight);
                         // bits
                         BitSet imageDescriptor = BitSet.valueOf(new byte[] { gif[byteIndex] });
                         byteIndex += 1;
@@ -224,11 +226,9 @@ public class GifExtractor {
                         }
 
                         if (localTable) {
-                            ImageGenerator img = new ImageGenerator(LocalColorTable, width, height, indexList,
-                                    String.valueOf(imgIndex));
+                            imgG.generateImage(LocalColorTable, width, height, indexList, String.valueOf(imgIndex),disposalMethod);
                         } else {
-                            ImageGenerator img = new ImageGenerator(GlobalColorTable, width, height, indexList,
-                                    String.valueOf(imgIndex));
+                            imgG.generateImage(GlobalColorTable, width, height, indexList, String.valueOf(imgIndex),disposalMethod);
                         }
 
                         imgIndex++;

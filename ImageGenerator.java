@@ -10,8 +10,28 @@ import java.nio.file.Paths;
 import javax.imageio.ImageIO;
 
 public class ImageGenerator {
-    public ImageGenerator(int[][] ColorTable, int width, int height, ArrayList<Integer> indexes,String name) {
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    private int count =0;
+    BufferedImage prevImg ;
+    public ImageGenerator(){
+
+    }
+    public void generateImage(int[][] ColorTable, int width, int height, ArrayList<Integer> indexes,String name,int disposalMethod) {
+        BufferedImage img;
+        switch (disposalMethod) {
+            case 0:
+                img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                break;
+        
+            default:
+                if (count != 0) {
+                    img = prevImg;
+                }
+                else{
+                    img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                }
+                break;
+        }
+         
         int pixelIndex = 0;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j <width ; j++) {
@@ -25,6 +45,8 @@ public class ImageGenerator {
                 }
             }
         }
+        prevImg = img;
+        count++;
         try {
             Files.createDirectories(Paths.get("extracted/"));
             File file = new File("extracted/"+name+".png");
