@@ -22,7 +22,6 @@ public class ImageGenerator {
                 if(pixelIndex == indexes.size() && pixelIndex != width*height){
                     j = 99999;
                     i = 99999;
-                    System.out.println("Couldnt fully color the image");
                 }
             }
         }

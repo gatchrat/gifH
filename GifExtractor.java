@@ -40,7 +40,7 @@ public class GifExtractor {
                     globalTableSize += 1;
                 }
                 globalTableSize = 3 * (int) Math.pow(2, globalTableSize + 1);
-                System.out.println("Eine Globale Farbentabelle mit " + globalTableSize + " bytes wird genutzt");
+                System.out.println("A global Color Table with " + globalTableSize / 3 + " colors is being used");
             }
             // Skippe noch 2 bytes wegen unwichtige info
             int byteIndex = 13;
@@ -57,6 +57,7 @@ public class GifExtractor {
 
             // Suche nach image descriptor gif[byteIndex] != 0x2c
             int imgIndex = 1;
+            int disposalMethod = 0;
             while (gif[byteIndex] != 0x3B) {
                 switch (gif[byteIndex]) {
                     case 0x21:
@@ -64,7 +65,48 @@ public class GifExtractor {
                         switch (gif[byteIndex]) {
                             case (byte) 0xf9:
                                 // Control Extension
-                                byteIndex += 7;
+                                byteIndex++;
+                                // size (always 4)
+                                byteIndex++;
+                                // settings
+                                BitSet controlSettings = BitSet.valueOf(new byte[] { gif[byteIndex] });
+                                boolean transparency = false;
+                                disposalMethod = 0;
+                                if (screenDescriptor.get(7 - 0)) {
+                                    //reserved
+                                }
+                                if (screenDescriptor.get(7 - 1)) {
+                                   //reserved;
+                                }
+                                if (screenDescriptor.get(7 - 2)) {
+                                    //reserved
+                                }
+                                if (screenDescriptor.get(7 - 3)) {
+                                    disposalMethod+=4;
+                                }
+                                if (screenDescriptor.get(7 - 4)) {
+                                   disposalMethod+=2;
+                                }
+                                if (screenDescriptor.get(7 - 5)) {
+                                   disposalMethod+=1;
+                                }
+                                if (screenDescriptor.get(7 - 6)) {
+                                    //User Input
+                                }
+                                if (screenDescriptor.get(7 - 7)) {
+                                   //transparency
+                                   transparency = true;
+                                }
+                                System.out.println(disposalMethod);
+                                byteIndex++;
+                                // delay time
+                                int delay =((gif[byteIndex+1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
+                                byteIndex++;
+                                byteIndex++;
+                                // transparent color index
+                                byteIndex++;
+                                // terminator
+                                byteIndex++;
                                 break;
                             case (byte) 0xff:
                                 // Application
@@ -98,7 +140,7 @@ public class GifExtractor {
                         byteIndex += 2;
                         int localHeight = ((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
                         byteIndex += 2;
-                        System.out.println("Cur. Image is " + localWidth + "x" + localHeight);
+                        // System.out.println("Cur. Image is " + localWidth + "x" + localHeight);
                         // bits
                         BitSet imageDescriptor = BitSet.valueOf(new byte[] { gif[byteIndex] });
                         byteIndex += 1;
@@ -130,12 +172,11 @@ public class GifExtractor {
 
                         if (localTable) {
                             colorSize = 3 * (int) Math.pow(2, colorSize + 1);
-                            System.out.println("A Local Color Table with " + colorSize/3 + " colors is being used");
+                            System.out.println("A Local Color Table with " + colorSize / 3 + " colors is being used");
                         }
                         // LOCAL COLOR TABLE
                         int[][] LocalColorTable = new int[colorSize][3];
                         if (colorSize != 0) {
-                            
 
                             for (int i = 0; i < colorSize / 3; i++) {
                                 for (int j = 0; j < 3; j++) {
@@ -159,7 +200,7 @@ public class GifExtractor {
                         }
                         byteIndex = oldIndex;
 
-                        System.out.println("Image Date is " + size + "bytes");
+                        // System.out.println("Image Data size is " + size + "bytes");
                         byte[] imageData = new byte[size];
                         int index = 0;
                         while (gif[byteIndex] != 0) {
@@ -174,22 +215,29 @@ public class GifExtractor {
 
                             byteIndex = byteIndex + curSize;
                         }
+                        // null block
+                        byteIndex++;
                         imageData = Util.reverseByteArray(imageData);
                         indexList.addAll(decoder.Decode(initCode, imageData, GlobalColorTable.length));
-                        System.out.println("Extracted " + indexList.size() + " indexes");
-                        if(localTable){
-                            ImageGenerator img = new ImageGenerator(LocalColorTable, width, height, indexList,String.valueOf(imgIndex));
+                        if (indexList.size() != localWidth * localHeight) {
+                            System.out.println("Missing " + (localWidth * localHeight - indexList.size()) + "indexes");
                         }
-                        else{
-                            ImageGenerator img = new ImageGenerator(GlobalColorTable, width, height, indexList,String.valueOf(imgIndex));
+
+                        if (localTable) {
+                            ImageGenerator img = new ImageGenerator(LocalColorTable, width, height, indexList,
+                                    String.valueOf(imgIndex));
+                        } else {
+                            ImageGenerator img = new ImageGenerator(GlobalColorTable, width, height, indexList,
+                                    String.valueOf(imgIndex));
                         }
-                        
+
                         imgIndex++;
                         break;
 
                     default:
                         // calculated a block wrong, go to next block
                         byteIndex++;
+                        System.out.println("skip");
                         break;
                 }
 

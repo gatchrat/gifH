@@ -13,7 +13,6 @@ public class LZWDecoder {
         int codeSize = initCode + 1;
         int resetCode = (int) Math.pow(2, initCode);
         int bits = value.length * 8;
-
         int endCode = (int) Math.pow(2, initCode) + 1;
         ArrayList<ArrayList<Integer>> codeTable = new ArrayList<ArrayList<Integer>>();
         ArrayList<ArrayList<Integer>> codeList = new ArrayList<ArrayList<Integer>>();
@@ -41,8 +40,6 @@ public class LZWDecoder {
         // init
         // read reset code
         int curCode = 0;
-        System.out.println("CODES:");
-        System.out.println("CodeSize:" + codeSize);
         for (int i = 0; i < codeSize; i++) {
             boolean curBit = dBits.get(bits - (byteIndex * 8 + 8 - bitOffset));
             bitOffset++;
@@ -55,7 +52,6 @@ public class LZWDecoder {
             }
 
         }
-        System.out.println("reset:" + curCode);
         int prevCode = 0;
         prevCode = curCode;
 
@@ -73,13 +69,11 @@ public class LZWDecoder {
             }
 
         }
-        // System.out.println("first code:" + curCode);
         codeList.add(new ArrayList<>(codeTable.get(curCode)));
         prevCode = curCode;
 
         // while code reading
         while (byteIndex < value.length - 1) {
-
             // read code
             curCode = 0;
             for (int i = 0; i < codeSize; i++) {
@@ -95,9 +89,7 @@ public class LZWDecoder {
                 }
             }
             // handle code
-            // System.out.println(curCode);
             if (curCode == resetCode) {
-                //System.out.println("Found Reset at " + byteIndex);
                 codeTable.clear();
                 for (int i = 0; i < tableLength; i++) {
                     codeTable.add(new ArrayList<Integer>());
@@ -127,7 +119,6 @@ public class LZWDecoder {
                     }
 
                 }
-                //System.out.println("first code:" + curCode);
                 codeList.add(new ArrayList<>(codeTable.get(curCode)));
                 prevCode = curCode;
                 continue;
@@ -150,20 +141,11 @@ public class LZWDecoder {
 
                 if (codeTable.size() - 1 == Math.pow(2, codeSize) - 1 && codeSize < 12) {
                     codeSize++;
-                    //System.out.println("CodeSize:" + codeSize + " at " + byteIndex);
                 }
                 prevCode = curCode;
 
             }
-            if (codeTable.size() == 4096) {
-                //System.out.println("full");
-            }
             if (curCode == endCode) {
-                //System.out.println("Found Ending Code at byte " + byteIndex);
-                //System.out.println("Table size:" + codeTable.size());
-                //System.out.println("List fold size:" + codeList.size());
-                byteIndex = 999999;
-                System.out.println("Encountered ending Code");
             }
         }
         ArrayList<Integer> finalList = new ArrayList<Integer>();
