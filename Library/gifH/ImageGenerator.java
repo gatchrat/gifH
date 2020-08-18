@@ -1,3 +1,5 @@
+package gifH;
+
 import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.Graphics2D;

@@ -11,7 +11,7 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
+
 *.war
 *.nar
 *.ear
@@ -30,3 +30,8 @@ Gif-Format.txt
 *.png
 *.gif
 settings.json
+out/*
+*.iml
+*/.idea/*
+*/out/*
+*/META-INF/*
