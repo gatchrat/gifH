@@ -8,4 +8,10 @@ public  class Util {
         }
         return ret;
     }
+    public static byte[] intTo2Byte(int n){
+        byte[] b = new byte[2];
+        b[0] = (byte) (n & 0xFF);
+        b[1] = (byte) ((n >> 8) & 0xFF);
+        return b;
+    }
 }
