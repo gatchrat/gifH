@@ -14,4 +14,9 @@ public  class Util {
         b[1] = (byte) ((n >> 8) & 0xFF);
         return b;
     }
+    public static double log2(int N)
+    {
+        double result = Math.log(N) / Math.log(2);
+        return result;
+    }
 }
