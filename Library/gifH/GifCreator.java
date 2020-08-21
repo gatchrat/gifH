@@ -139,6 +139,10 @@ public class GifCreator {
                         localTableBits -= 1;
                     }
                 }
+                else{
+                    localTableBits = globalTableBits;
+                    localTableSize=globalTableSize;
+                }
                 if(localSettings.size() == 0){
                     imageDescriptor[9] =0x00;
                 }
@@ -148,6 +152,12 @@ public class GifCreator {
                 stream.write(imageDescriptor);
                 //LocalColorTable
                 //ImageData
+                //initial size
+                byte[] initSize = new byte[1];
+                initSize[0] = (byte)(localTableBits+2);
+                stream.write(initSize);
+                //pure data
+                stream.write(LZWEncoder.encodeImage(f,localTableSize,colors));
             }
 
 

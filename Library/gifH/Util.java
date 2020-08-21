@@ -19,4 +19,18 @@ public  class Util {
         double result = Math.log(N) / Math.log(2);
         return result;
     }
+    //(6,3) = [false,true,true] = 011 = 110
+    public static boolean[] intToBit(int n, int BitSize){
+        boolean[] bits = new boolean[BitSize];
+        for (int i = BitSize-1; i >= 0; i--) {
+            if (n >= Math.pow(2,i)) {
+                bits[i] = true;
+                n-=Math.pow(2,i);
+            }
+            else{
+                bits[i] = false;
+            }
+        }
+        return bits;
+    }
 }
