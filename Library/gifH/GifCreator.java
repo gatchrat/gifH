@@ -14,7 +14,6 @@ import java.util.BitSet;
 
 public class GifCreator {
     public GifCreator(ArrayList<File> images, int waitTime, String name) {
-        byte[] d;
         ByteBuffer data;
 
         try {
@@ -39,7 +38,6 @@ public class GifCreator {
             stream.write(data.array());
 
             byte[] empty = new byte[1];
-            empty[0] = 0;
             BitSet screenDescriptor = BitSet.valueOf(empty);
             boolean globalTable = true;
             screenDescriptor.set(7 - 0, globalTable);
@@ -47,15 +45,15 @@ public class GifCreator {
             // 4 = sort
             ArrayList<Color> colors = getDifferentColors(images);
             int globalTableSize = colors.size();
-            if(globalTableSize == 1){
+            if (globalTableSize == 1) {
                 globalTableSize++;
             }
             //round to next bigger power of 2
-            while(Util.log2(globalTableSize) != Math.floor(Util.log2(globalTableSize))){
+            while (Util.log2(globalTableSize) != Math.floor(Util.log2(globalTableSize))) {
                 globalTableSize++;
             }
-            System.out.println("New Global Table size is " +globalTableSize);
-            int globalTableBits = (int)Util.log2(globalTableSize)-1;
+            System.out.println("New Global Table size is " + globalTableSize);
+            int globalTableBits = (int) Util.log2(globalTableSize) - 1;
             if (globalTableBits >= 4) {
                 screenDescriptor.set(7 - 5, true);
                 globalTableBits -= 4;
@@ -71,35 +69,86 @@ public class GifCreator {
             stream.write(screenDescriptor.toByteArray());
             //background color index
             empty = new byte[1];
-            empty[0] = 0;
             stream.write(empty);
             //pixel aspect ration
             empty = new byte[1];
-            empty[0] = 0;
             stream.write(empty);
             //GLOBAL TABLE
-            if(globalTable){
-                byte[] globalTableBytes = new byte[globalTableSize*3];
+            if (globalTable) {
+                byte[] globalTableBytes = new byte[globalTableSize * 3];
                 int numColors = globalTableSize;
                 for (int i = 0; i < globalTableSize; i++) {
                     Color c;
-                    if(i < colors.size()){
+                    if (i < colors.size()) {
                         c = colors.get(i);
-                    }
-                    else{
+                    } else {
                         c = colors.get(0);
                     }
-                    globalTableBytes[i*3] =(byte)c.getRed();
-                    globalTableBytes[i*3+1] =(byte)c.getGreen();
-                    globalTableBytes[i*3+2] =(byte)c.getBlue();
+                    globalTableBytes[i * 3] = (byte) c.getRed();
+                    globalTableBytes[i * 3 + 1] = (byte) c.getGreen();
+                    globalTableBytes[i * 3 + 2] = (byte) c.getBlue();
                 }
                 stream.write(globalTableBytes);
             }
             //Custom Comment
 
             //LOOP
-            //ImageDescriptor
-            //ImageData
+            for (File f : images) {
+                //ImageDescriptor
+                byte[] imageDescriptor = new byte[10];
+                BufferedImage image = ImageIO.read(f);
+                imageDescriptor[0] = (byte) 0x2c;
+                //2 byte left pos
+                //2 byte right pos
+                //width
+                imageDescriptor[5] = Util.intTo2Byte(image.getWidth())[0];
+                imageDescriptor[6] = Util.intTo2Byte(image.getWidth())[1];
+                //height
+                imageDescriptor[7] = Util.intTo2Byte(image.getHeight())[0];
+                imageDescriptor[8] = Util.intTo2Byte(image.getHeight())[1];
+                //settings
+                empty = new byte[1];
+                BitSet localSettings = BitSet.valueOf(empty);
+
+                boolean localTable = false;
+                int localTableSize = colors.size();
+                if (localTableSize == 1) {
+                    localTableSize++;
+                }
+                //round to next bigger power of 2
+                while (Util.log2(localTableSize) != Math.floor(Util.log2(localTableSize))) {
+                    localTableSize++;
+                }
+                int localTableBits = (int) Util.log2(localTableSize) - 1;
+                localSettings.set(7 - 0, localTable);
+                //interlace
+                //sort
+                //2xreserved
+                //Table Size
+                if (localTable) {
+                    if (localTableBits >= 4) {
+                        localSettings.set(7 - 5, true);
+                        localTableBits -= 4;
+                    }
+                    if (localTableBits >= 2) {
+                        localSettings.set(7 - 6, true);
+                        localTableBits -= 2;
+                    }
+                    if (localTableBits >= 1) {
+                        localSettings.set(7 - 7, true);
+                        localTableBits -= 1;
+                    }
+                }
+                if(localSettings.size() == 0){
+                    imageDescriptor[9] =0x00;
+                }
+                else{
+                    imageDescriptor[9] = localSettings.toByteArray()[0];
+                }
+                stream.write(imageDescriptor);
+                //LocalColorTable
+                //ImageData
+            }
 
 
             // END
