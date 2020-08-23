@@ -31,8 +31,9 @@ public class GifCreator {
             data.put((byte) '9');
             data.put((byte) 'a');
             // SCREEN DESCRIPTOR
-            int width = 10;
-            int height = 10;
+            int[] sizes = getMaxSize(images);
+            int width = sizes[0];
+            int height = sizes[1];
             data.put(Util.intTo2Byte(width));
             data.put(Util.intTo2Byte(height));
             stream.write(data.array());
@@ -201,5 +202,16 @@ public class GifCreator {
             }
         }
         return c;
+    }
+    int[] getMaxSize(ArrayList<File> images) throws IOException {
+        int[] size = new int[2];
+        for (File f: images) {
+            BufferedImage image = ImageIO.read(f);
+            int height = image.getHeight();
+            int width = image.getWidth();
+            size[0]= Math.max(size[0],width);
+            size[1]= Math.max(size[1],height);
+        }
+        return size;
     }
 }
