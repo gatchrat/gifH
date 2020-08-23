@@ -11,14 +11,14 @@ import java.util.BitSet;
 public class LZWEncoder {
     public static byte[] encodeImage(File f, int colorTableSize, ArrayList<Color> colorTable) throws IOException {
         //[code,bitLength],[...],...
-        colorTableSize = Math.max(4,colorTableSize);
+        colorTableSize = Math.max(4, colorTableSize);
         ArrayList<Integer[]> codes = new ArrayList<Integer[]>();
-        int bitsToRead = (int)Util.log2(colorTableSize)+1;
-        System.out.println("Start with " +bitsToRead + " bits");
+        int bitsToRead = (int) Util.log2(colorTableSize) + 1;
+        System.out.println("Start with " + bitsToRead + " bits");
         ArrayList<ArrayList<Integer>> codeTable = new ArrayList<ArrayList<Integer>>();
         ArrayList<Integer> indexBuffer = new ArrayList<Integer>();
         int resetCode = colorTableSize;
-        int endCode = colorTableSize+1;
+        int endCode = colorTableSize + 1;
         //init codetable
         for (int i = 0; i < resetCode; i++) {
             codeTable.add(new ArrayList<Integer>());
@@ -34,7 +34,7 @@ public class LZWEncoder {
         codeTable.add(new ArrayList<Integer>());
         codeTable.get(codeTable.size() - 1).add(endCode);
         //start with reset code
-        codes.add(new Integer[] {resetCode, bitsToRead});
+        codes.add(new Integer[]{resetCode, bitsToRead});
         //add rest of data
         BufferedImage image = ImageIO.read(f);
         int height = image.getHeight();
@@ -45,7 +45,7 @@ public class LZWEncoder {
                 int index = colorTable.indexOf(color);
                 indexBuffer.add(index);
                 //if not first code
-                if(!(row == col && col == 0)) {
+                if (!(row == col && col == 0)) {
                     if (codeTable.contains(indexBuffer)) {
                         //keep buffer
                     } else {
@@ -53,11 +53,32 @@ public class LZWEncoder {
                         indexBuffer.remove(indexBuffer.size() - 1);
                         int code = codeTable.indexOf(indexBuffer);
                         codes.add(new Integer[]{code, bitsToRead});
-                        System.out.println(code);
-                        if(codeTable.size()-1 == (int)Math.pow(2,bitsToRead)){
+                        if (codeTable.size() - 1 == (int) Math.pow(2, bitsToRead)) {
                             bitsToRead++;
-                           System.out.println("CodeSize:"+bitsToRead);
+                            if (bitsToRead == 13) {
+                               // System.out.println("Reset");
+                                codes.add(new Integer[]{resetCode, 12});
+                                codeTable.clear();
+                                bitsToRead = (int) Util.log2(colorTableSize) + 1;
+                                for (int i = 0; i < resetCode; i++) {
+                                    codeTable.add(new ArrayList<Integer>());
+                                    codeTable.get(codeTable.size() - 1).add(i);
+                                }
+                                // fill empty space
+                                while (codeTable.size() < resetCode) {
+                                    codeTable.add(new ArrayList<Integer>());
+                                }
+                                // add 2 special values
+                                codeTable.add(new ArrayList<Integer>());
+                                codeTable.get(codeTable.size() - 1).add(resetCode);
+                                codeTable.add(new ArrayList<Integer>());
+                                codeTable.get(codeTable.size() - 1).add(endCode);
+                                //start with reset code
+                                codes.add(new Integer[]{resetCode, bitsToRead});
+                            }
+                            //System.out.println("CodeSize:"+bitsToRead);
                         }
+
                         indexBuffer.clear();
                         indexBuffer.add(index);
                     }
@@ -65,16 +86,16 @@ public class LZWEncoder {
             }
         }
         //add last code
-        codes.add(new Integer[] {codeTable.indexOf(indexBuffer), bitsToRead});
-        if(codeTable.indexOf(indexBuffer) == (int)Math.pow(2,bitsToRead)-1){
+        codes.add(new Integer[]{codeTable.indexOf(indexBuffer), bitsToRead});
+        if (codeTable.indexOf(indexBuffer) == (int) Math.pow(2, bitsToRead) - 1) {
             bitsToRead++;
         }
-        System.out.println(codeTable.indexOf(indexBuffer));
         //END
-        codes.add(new Integer[] {endCode, bitsToRead});
+        codes.add(new Integer[]{endCode, bitsToRead});
         return LZWEncoder.codeToData(codes);
     }
-    private static <Bitset> byte[] codeToData(ArrayList<Integer[]> codes){
+
+    private static <Bitset> byte[] codeToData(ArrayList<Integer[]> codes) {
         //[Size][second Code,First Code][Third Code, Second Code] [0x00]
 
         int curNumBytes = 0;
@@ -82,36 +103,47 @@ public class LZWEncoder {
         for (int i = 0; i < codes.size(); i++) {
             bitsNeeded = bitsNeeded + codes.get(i)[1];
         }
-        int length = (int) Math.ceil(bitsNeeded/8);
+        int length = (int) Math.ceil(bitsNeeded / 8);
         System.out.println("Will be " + length + " bytes");
-        if(length > 255){
-            System.out.println("Too much Data, cant handle");
-        }
         int byteIndex = 0;
         int bitOffset = 0;
         //Start with last bit, work backwards
-        BitSet bits = new BitSet(length*8);
-        int index = length*8-1;
-        for (int i = 0; i <codes.size() ; i++) {
-            boolean[] codeBits = Util.intToBit(codes.get(i)[0],codes.get(i)[1]);
+        BitSet bits = new BitSet(length * 8);
+        int index = length * 8 - 1;
+        for (int i = 0; i < codes.size(); i++) {
+            boolean[] codeBits = Util.intToBit(codes.get(i)[0], codes.get(i)[1]);
             for (int j = 0; j < codeBits.length; j++) {
-                if(codeBits[j]){
-                    bits.set(length*8 -(byteIndex * 8 + 8 - bitOffset));
+                if (codeBits[j]) {
+                    bits.set(length * 8 - (byteIndex * 8 + 8 - bitOffset));
                 }
                 bitOffset++;
-                if(bitOffset==8){
-                    bitOffset =0;
+                if (bitOffset == 8) {
+                    bitOffset = 0;
                     byteIndex++;
                 }
             }
         }
-        byte[] data = new byte[length+2];
-        data[0] = (byte)length;
+        int lengthWithSize = length + (int) Math.ceil(length / 255) + 1;
+        byte[] data = new byte[lengthWithSize];
         byte[] codeBytes = bits.toByteArray();
-        for (int i = 1; i <=length ; i++) {
-            data[i] = codeBytes[codeBytes.length-i];
+        int countdown = 0;
+        int indexB = 0;
+        for (int i = 1; i <= length; i++) {
+            if (countdown == 0) {
+                int bytesLeft = codeBytes.length - i + 1;
+                if (bytesLeft < 256) {
+                    countdown = bytesLeft;
+                    data[index] = (byte) bytesLeft;
+                } else {
+                    countdown = 255;
+                    data[index] = (byte) 255;
+                }
+            }
+            data[index] = codeBytes[codeBytes.length - i];
+            countdown--;
+            indexB++;
         }
-        data[length+1] = 0x00;
+        data[lengthWithSize - 1] = 0x00;
         return data;
     }
 }
