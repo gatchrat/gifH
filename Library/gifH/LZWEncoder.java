@@ -112,51 +112,81 @@ public class LZWEncoder {
             bitsNeeded = bitsNeeded + codes.get(i)[1];
         }
         int length = (int) (Math.ceil(bitsNeeded / 8));
-        System.out.println("Will be " + (Math.ceil(bitsNeeded / 8)) + " bytes");
         int byteIndex = 0;
         int bitOffset = 0;
         //Start with last bit, work backwards
-        BitSet bits = new BitSet(length);
-
+        //BitSet bits = new BitSet(length);
+        int lengthWithSize = length + (int) Math.ceil(length / 254) + 1;
+        BitSet bits = new BitSet(lengthWithSize);
         int index = length * 8 - 1;
+        int countdown = 0;
+        int leftOverBytes =length;
+
+        System.out.println(length);
         for (int i = 0; i < codes.size(); i++) {
+            if(countdown == 0){
+                System.out.println(byteIndex);
+                if(leftOverBytes >= 254){
+                    countdown = 254;
+                    leftOverBytes-=254;
+                }
+                else{
+                    countdown = leftOverBytes;
+                    leftOverBytes=0;
+                }
+
+                boolean[] sizeBits =  Util.intToBit(countdown, 8);
+                for (int j = 0; j < sizeBits.length; j++) {
+                    if (sizeBits[j]) {
+                        bits.set(lengthWithSize * 8 - (byteIndex * 8 + 8 - bitOffset));
+                    }
+                    bitOffset++;
+                    if (bitOffset == 8) {
+                        bitOffset = 0;
+                        byteIndex++;
+                    }
+                }
+            }
             boolean[] codeBits = Util.intToBit(codes.get(i)[0], codes.get(i)[1]);
 
             for (int j = 0; j < codeBits.length; j++) {
                 if (codeBits[j]) {
-                    bits.set(length * 8 - (byteIndex * 8 + 8 - bitOffset));
+                    bits.set(lengthWithSize * 8 - (byteIndex * 8 + 8 - bitOffset));
                 }
                 bitOffset++;
                 if (bitOffset == 8) {
                     bitOffset = 0;
                     byteIndex++;
+                    countdown--;
+                    //write buffer size
+                    if(countdown == 0){
+                        System.out.println(byteIndex);
+                        if(leftOverBytes >= 254){
+                            countdown = 254;
+                            leftOverBytes-=254;
+                        }
+                        else{
+                            countdown = leftOverBytes;
+                            leftOverBytes=0;
+                        }
+
+                        boolean[] sizeBits =  Util.intToBit(countdown, 8);
+                        for (int i1 = 0; i1 < sizeBits.length; i1++) {
+                            if (sizeBits[i1]) {
+                                bits.set(lengthWithSize * 8 - (byteIndex * 8 + 8 - bitOffset));
+                            }
+                            bitOffset++;
+                            if (bitOffset == 8) {
+                                bitOffset = 0;
+                                byteIndex++;
+                            }
+                        }
+                    }
                 }
             }
         }
-        int lengthWithSize = length + (int) Math.ceil(length / 255) + 1;
-        byte[] data = new byte[lengthWithSize];
-        byte[] codeBytes = bits.toByteArray();
-        int countdown = 0;
-        int indexB = 0;
-        for (int i = 1; i <= length; i++) {
-            if (countdown == 0) {
-                int bytesLeft = codeBytes.length - i + 1;
-                if (bytesLeft < 254) {
-                    countdown = bytesLeft;
-                    data[indexB] = (byte) bytesLeft;
-                } else {
-                    countdown = 254;
-                    data[indexB] = (byte) 254;
-                }
-                indexB++;
-            }
-            data[indexB] = codeBytes[codeBytes.length - i];
-            countdown--;
-            indexB++;
-        }
 
-        data[lengthWithSize - 1] = 0x00;
 
-        return data;
+        return Util.reverseByteArray(bits.toByteArray());
     }
 }

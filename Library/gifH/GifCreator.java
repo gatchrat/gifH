@@ -159,6 +159,10 @@ public class GifCreator {
                 stream.write(initSize);
                 //pure data
                 stream.write(LZWEncoder.encodeImage(f,localTableSize,colors));
+                //0 byte block
+                empty = new byte[1];
+                empty[0] = 0x00;
+                stream.write(empty);
             }
 
 
@@ -166,7 +170,7 @@ public class GifCreator {
             stream.write(new byte[]{0x3b});
             stream.close();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
