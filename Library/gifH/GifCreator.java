@@ -47,7 +47,7 @@ public class GifCreator {
             ArrayList<Color> colors = getDifferentColors(images);
             int globalTableSize = colors.size();
             if (globalTableSize == 1) {
-                globalTableSize++;
+                globalTableSize ++;
             }
             //round to next bigger power of 2
             while (Util.log2(globalTableSize) != Math.floor(Util.log2(globalTableSize))) {
@@ -155,7 +155,7 @@ public class GifCreator {
                 //ImageData
                 //initial size
                 byte[] initSize = new byte[1];
-                initSize[0] = (byte)(localTableBits+2);
+                initSize[0] = (byte)((int) Util.log2(localTableSize));
                 stream.write(initSize);
                 //pure data
                 stream.write(LZWEncoder.encodeImage(f,localTableSize,colors));

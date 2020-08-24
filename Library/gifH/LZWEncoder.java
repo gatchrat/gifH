@@ -18,6 +18,7 @@ public class LZWEncoder {
         ArrayList<ArrayList<Integer>> codeTable = new ArrayList<ArrayList<Integer>>();
         ArrayList<Integer> indexBuffer = new ArrayList<Integer>();
         int resetCode = colorTableSize;
+        System.out.println("reset is " +colorTableSize );
         int endCode = colorTableSize + 1;
         //init codetable
         for (int i = 0; i < resetCode; i++) {
@@ -43,6 +44,7 @@ public class LZWEncoder {
             for (int col = 0; col < width; col++) {
                 Color color = new Color(image.getRGB(col, row));
                 int index = colorTable.indexOf(color);
+
                 indexBuffer.add(index);
                 //if not first code
                 if (!(row == col && col == 0)) {
@@ -139,13 +141,14 @@ public class LZWEncoder {
         for (int i = 1; i <= length; i++) {
             if (countdown == 0) {
                 int bytesLeft = codeBytes.length - i + 1;
-                if (bytesLeft < 256) {
+                if (bytesLeft < 254) {
                     countdown = bytesLeft;
                     data[indexB] = (byte) bytesLeft;
                 } else {
-                    countdown = 255;
-                    data[indexB] = (byte) 255;
+                    countdown = 254;
+                    data[indexB] = (byte) 254;
                 }
+                indexB++;
             }
             data[indexB] = codeBytes[codeBytes.length - i];
             countdown--;
@@ -153,7 +156,7 @@ public class LZWEncoder {
         }
 
         data[lengthWithSize - 1] = 0x00;
-        System.out.println("Generated " + data.length + " bytes");
+
         return data;
     }
 }
