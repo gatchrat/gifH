@@ -56,7 +56,6 @@ public class LZWDecoder {
         }
         int prevCode = 0;
         prevCode = curCode;
-
         // read a single code
         curCode = 0;
         for (int i = 0; i < codeSize; i++) {
@@ -107,8 +106,23 @@ public class LZWDecoder {
                 codeTable.add(new ArrayList<Integer>());
                 codeTable.get(codeTable.size() - 1).add(endCode);
                 codeSize = initCode + 1;
-                // read a single code
+
                 curCode = 0;
+                // read reset
+                for (int i = 0; i < codeSize; i++) {
+                    boolean curBit = dBits.get(bits - (byteIndex * 8 + 8 - bitOffset));
+                    bitOffset++;
+                    if (bitOffset == 8) {
+                        bitOffset = 0;
+                        byteIndex++;
+                    }
+                    if (curBit) {
+                        curCode += Math.pow(2, i);
+                    }
+
+                }
+                curCode =0;
+                // read a single code
                 for (int i = 0; i < codeSize; i++) {
                     boolean curBit = dBits.get(bits - (byteIndex * 8 + 8 - bitOffset));
                     bitOffset++;

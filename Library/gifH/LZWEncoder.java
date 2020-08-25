@@ -58,7 +58,6 @@ public class LZWEncoder {
                         if (codeTable.size() - 1 == (int) Math.pow(2, bitsToRead)) {
                             bitsToRead++;
                             if (bitsToRead == 13) {
-                                // System.out.println("Reset");
                                 codes.add(new Integer[]{resetCode, 12});
                                 codeTable.clear();
                                 bitsToRead = (int) Util.log2(colorTableSize) + 1;
@@ -75,7 +74,7 @@ public class LZWEncoder {
                                 codeTable.get(codeTable.size() - 1).add(resetCode);
                                 codeTable.add(new ArrayList<Integer>());
                                 codeTable.get(codeTable.size() - 1).add(endCode);
-                                //start with reset code
+                                // start with reset code
                                 codes.add(new Integer[]{resetCode, bitsToRead});
                             }
                             //System.out.println("CodeSize:"+bitsToRead);
@@ -105,7 +104,6 @@ public class LZWEncoder {
 
     private static <Bitset> byte[] codeToData(ArrayList<Integer[]> codes) {
         //[Size][second Code,First Code][Third Code, Second Code] [0x00]
-
         int curNumBytes = 0;
         float bitsNeeded = 0;
         for (int i = 0; i < codes.size(); i++) {
@@ -125,7 +123,6 @@ public class LZWEncoder {
         System.out.println(length);
         for (int i = 0; i < codes.size(); i++) {
             if(countdown == 0){
-                System.out.println(byteIndex);
                 if(leftOverBytes >= 254){
                     countdown = 254;
                     leftOverBytes-=254;
@@ -134,7 +131,6 @@ public class LZWEncoder {
                     countdown = leftOverBytes;
                     leftOverBytes=0;
                 }
-
                 boolean[] sizeBits =  Util.intToBit(countdown, 8);
                 for (int j = 0; j < sizeBits.length; j++) {
                     if (sizeBits[j]) {
@@ -160,7 +156,6 @@ public class LZWEncoder {
                     countdown--;
                     //write buffer size
                     if(countdown == 0){
-                        System.out.println(byteIndex);
                         if(leftOverBytes >= 254){
                             countdown = 254;
                             leftOverBytes-=254;
@@ -169,7 +164,6 @@ public class LZWEncoder {
                             countdown = leftOverBytes;
                             leftOverBytes=0;
                         }
-
                         boolean[] sizeBits =  Util.intToBit(countdown, 8);
                         for (int i1 = 0; i1 < sizeBits.length; i1++) {
                             if (sizeBits[i1]) {
