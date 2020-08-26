@@ -115,7 +115,7 @@ public class GifCreator {
                 graphicControlExtension[2] = (byte) 0x04;
                 //packed field
                 BitSet GCEBitset = new BitSet(8);
-                int disposalMethod = 2;
+                int disposalMethod = 0;
                 if (disposalMethod >= 4) {
                     GCEBitset.set(7 - 3, true);
                     disposalMethod -= 4;
@@ -129,7 +129,9 @@ public class GifCreator {
                 }
                 //1 bit userinput flag
                 // 1 bit transparency flag
-                graphicControlExtension[3] = GCEBitset.toByteArray()[0];
+                if(GCEBitset.toByteArray().length >0){
+                    graphicControlExtension[3] = GCEBitset.toByteArray()[0];
+                }
                 //delay time
                 int delayTime = 10;
                 graphicControlExtension[4] = Util.intTo2Byte(delayTime)[0];

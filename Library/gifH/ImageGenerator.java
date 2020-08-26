@@ -21,11 +21,13 @@ public class ImageGenerator {
         BufferedImage img;
 
         switch (disposalMethod) {
+            //Replace all
             case 0:
                 img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
                 break;
-        
-            default:
+            //Replace with non transparent
+            case 1:
+                //needs transparency
                 if (count != 0) {
                     //if size changed copy image and refit
                     if(prevImg.getWidth() != width || prevImg.getHeight() != height){
@@ -45,6 +47,23 @@ public class ImageGenerator {
                 else{
                     img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
                 }
+                break;
+            //Replace Background with non transparent
+            case 2:
+                //needs transparency and background
+                img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                break;
+            case 3:
+                // Restore to previus (only works when size stays the same)
+                if (count != 0) {
+                    img = prevImg;
+                }
+                else{
+                    img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                }
+                break;
+            default:
+                img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
                 break;
         }
          

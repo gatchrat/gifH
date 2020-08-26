@@ -15,6 +15,5 @@ Can generate a Gif from a single Image or multiple Images.
 * info when unpacking
 * Transparency
 * Background
-* color size bits
-* Disposal Methods (2-7) (Currently all implemented as method 1 )
+* Disposal Methods (2-4) (Currently all implemented as method 1 )
 * Documentation
