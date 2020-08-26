@@ -40,14 +40,14 @@ public class GifCreator {
 
             byte[] empty = new byte[1];
             BitSet screenDescriptor = BitSet.valueOf(empty);
-            boolean globalTable = true;
+            boolean globalTable = false;
             screenDescriptor.set(7 - 0, globalTable);
             //1-3 Colorresolution
             // 4 = sort
-            ArrayList<Color> colors = getDifferentColors(images);
+            ArrayList<Color> colors = getDifferentColors(images.get(0));
             int globalTableSize = colors.size();
             if (globalTableSize == 1) {
-                globalTableSize ++;
+                globalTableSize++;
             }
             //round to next bigger power of 2
             while (Util.log2(globalTableSize) != Math.floor(Util.log2(globalTableSize))) {
@@ -111,8 +111,9 @@ public class GifCreator {
                 empty = new byte[1];
                 BitSet localSettings = BitSet.valueOf(empty);
 
-                boolean localTable = false;
-                int localTableSize = colors.size();
+                boolean localTable = true;
+                ArrayList<Color> localColors = getDifferentColors(f);
+                int localTableSize = localColors.size();
                 if (localTableSize == 1) {
                     localTableSize++;
                 }
@@ -120,6 +121,8 @@ public class GifCreator {
                 while (Util.log2(localTableSize) != Math.floor(Util.log2(localTableSize))) {
                     localTableSize++;
                 }
+
+                System.out.println("New Local Table size is " + globalTableSize);
                 int localTableBits = (int) Util.log2(localTableSize) - 1;
                 localSettings.set(7 - 0, localTable);
                 //interlace
@@ -139,26 +142,40 @@ public class GifCreator {
                         localSettings.set(7 - 7, true);
                         localTableBits -= 1;
                     }
-                }
-                else{
+                } else {
                     localTableBits = globalTableBits;
-                    localTableSize=globalTableSize;
+                    localTableSize = globalTableSize;
                 }
-                if(localSettings.size() == 0){
-                    imageDescriptor[9] =0x00;
-                }
-                else{
+                if (localSettings.size() == 0) {
+                    imageDescriptor[9] = 0x00;
+                } else {
                     imageDescriptor[9] = localSettings.toByteArray()[0];
                 }
                 stream.write(imageDescriptor);
                 //LocalColorTable
+                if (localTable) {
+                    byte[] localTableBytes = new byte[localTableSize * 3];
+                    int numColors = globalTableSize;
+                    for (int i = 0; i < globalTableSize; i++) {
+                        Color c;
+                        if (i < localColors.size()) {
+                            c = localColors.get(i);
+                        } else {
+                            c = localColors.get(0);
+                        }
+                        localTableBytes[i * 3] = (byte) c.getRed();
+                        localTableBytes[i * 3 + 1] = (byte) c.getGreen();
+                        localTableBytes[i * 3 + 2] = (byte) c.getBlue();
+                    }
+                    stream.write(localTableBytes);
+                }
                 //ImageData
                 //initial size
                 byte[] initSize = new byte[1];
-                initSize[0] = (byte)((int) Util.log2(localTableSize));
+                initSize[0] = (byte) ((int) Util.log2(localTableSize));
                 stream.write(initSize);
                 //pure data
-                stream.write(LZWEncoder.encodeImage(f,localTableSize,colors));
+                stream.write(LZWEncoder.encodeImage(f, localTableSize, localColors));
                 //0 byte block
                 empty = new byte[1];
                 empty[0] = 0x00;
@@ -174,22 +191,22 @@ public class GifCreator {
         }
     }
 
-    ArrayList<Color> getDifferentColors(ArrayList<File> files) throws IOException {
+    ArrayList<Color> getDifferentColors(File file) throws IOException {
         ArrayList<Color> c = new ArrayList<Color>();
-        for (File f : files) {
-            BufferedImage image = ImageIO.read(f);
-            int height = image.getHeight();
-            int width = image.getWidth();
-            for (int row = 0; row < height; row++) {
-                for (int col = 0; col < width; col++) {
-                    Color color = new Color(image.getRGB(col, row));
-                    if (!c.contains(color)) {
-                        c.add(color);
-                    }
+
+        BufferedImage image = ImageIO.read(file);
+        int height = image.getHeight();
+        int width = image.getWidth();
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                Color color = new Color(image.getRGB(col, row));
+                if (!c.contains(color)) {
+                    c.add(color);
                 }
             }
-
         }
+
+
         return c;
     }
 
@@ -207,14 +224,15 @@ public class GifCreator {
         }
         return c;
     }
+
     int[] getMaxSize(ArrayList<File> images) throws IOException {
         int[] size = new int[2];
-        for (File f: images) {
+        for (File f : images) {
             BufferedImage image = ImageIO.read(f);
             int height = image.getHeight();
             int width = image.getWidth();
-            size[0]= Math.max(size[0],width);
-            size[1]= Math.max(size[1],height);
+            size[0] = Math.max(size[0], width);
+            size[1] = Math.max(size[1], height);
         }
         return size;
     }

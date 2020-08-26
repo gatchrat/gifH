@@ -222,7 +222,12 @@ public class GifExtractor {
                         // null block
                         byteIndex++;
                         imageData = Util.reverseByteArray(imageData);
-                        indexList.addAll(decoder.Decode(initCode, imageData, GlobalColorTable.length));
+                        if (localTable) {
+                            indexList.addAll(decoder.Decode(initCode, imageData, LocalColorTable.length/3));
+                        } else {
+                            indexList.addAll(decoder.Decode(initCode, imageData, GlobalColorTable.length));
+                        }
+
                         if (indexList.size() != localWidth * localHeight) {
                             System.out.println("Missing " + (localWidth * localHeight - indexList.size()) + "indexes");
                         }
