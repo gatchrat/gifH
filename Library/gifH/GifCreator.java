@@ -42,7 +42,20 @@ public class GifCreator {
             BitSet screenDescriptor = BitSet.valueOf(empty);
             boolean globalTable = false;
             screenDescriptor.set(7 - 0, globalTable);
+            int colorresolution = 7;
             //1-3 Colorresolution
+            if (colorresolution >= 4) {
+                screenDescriptor.set(7 - 1, true);
+                colorresolution -= 4;
+            }
+            if (colorresolution >= 2) {
+                screenDescriptor.set(7 - 2, true);
+                colorresolution -= 2;
+            }
+            if (colorresolution >= 1) {
+                screenDescriptor.set(7 - 3, true);
+                colorresolution -= 1;
+            }
             // 4 = sort
             ArrayList<Color> colors = getDifferentColors(images.get(0));
             int globalTableSize = colors.size();
@@ -71,7 +84,7 @@ public class GifCreator {
             //background color index
             empty = new byte[1];
             stream.write(empty);
-            //pixel aspect ration
+            //pixel aspect ratio
             empty = new byte[1];
             stream.write(empty);
             //GLOBAL TABLE
@@ -95,6 +108,40 @@ public class GifCreator {
 
             //LOOP
             for (File f : images) {
+                //Graphic Control Extension
+                byte[] graphicControlExtension = new byte[8];
+                graphicControlExtension[0] = (byte) 0x21;
+                graphicControlExtension[1] = (byte) 0xF9;
+                graphicControlExtension[2] = (byte) 0x04;
+                //packed field
+                BitSet GCEBitset = new BitSet(8);
+                int disposalMethod = 2;
+                if (disposalMethod >= 4) {
+                    GCEBitset.set(7 - 3, true);
+                    disposalMethod -= 4;
+                }
+                if (disposalMethod >= 2) {
+                    GCEBitset.set(7 - 4, true);
+                    disposalMethod -= 2;
+                }
+                if (disposalMethod >= 1) {
+                    GCEBitset.set(7 - 5, true);
+                }
+                //1 bit userinput flag
+                // 1 bit transparency flag
+                graphicControlExtension[3] = GCEBitset.toByteArray()[0];
+                //delay time
+                int delayTime = 10;
+                graphicControlExtension[4] = Util.intTo2Byte(delayTime)[0];
+                graphicControlExtension[5] = Util.intTo2Byte(delayTime)[1];
+                //transparent color index
+                int transparentIndex = 0;
+                graphicControlExtension[6] = (byte) transparentIndex;
+                //terminator
+                stream.write(graphicControlExtension);
+
+
+
                 //ImageDescriptor
                 byte[] imageDescriptor = new byte[10];
                 BufferedImage image = ImageIO.read(f);

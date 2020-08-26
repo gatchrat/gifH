@@ -73,34 +73,34 @@ public class GifExtractor {
                                 byteIndex++;
                                 // settings
                                 BitSet controlSettings = BitSet.valueOf(new byte[] { gif[byteIndex] });
+                                System.out.println(controlSettings.toString());
                                 boolean transparency = false;
                                 disposalMethod = 0;
-                                if (screenDescriptor.get(7 - 0)) {
+                                if (controlSettings.get(7 - 0)) {
                                     // reserved
                                 }
-                                if (screenDescriptor.get(7 - 1)) {
+                                if (controlSettings.get(7 - 1)) {
                                     // reserved;
                                 }
-                                if (screenDescriptor.get(7 - 2)) {
+                                if (controlSettings.get(7 - 2)) {
                                     // reserved
                                 }
-                                if (screenDescriptor.get(7 - 3)) {
+                                if (controlSettings.get(7 - 3)) {
                                     disposalMethod += 4;
                                 }
-                                if (screenDescriptor.get(7 - 4)) {
+                                if (controlSettings.get(7 - 4)) {
                                     disposalMethod += 2;
                                 }
-                                if (screenDescriptor.get(7 - 5)) {
+                                if (controlSettings.get(7 - 5)) {
                                     disposalMethod += 1;
                                 }
-                                if (screenDescriptor.get(7 - 6)) {
+                                if (controlSettings.get(7 - 6)) {
                                     // User Input
                                 }
-                                if (screenDescriptor.get(7 - 7)) {
+                                if (controlSettings.get(7 - 7)) {
                                     // transparency
                                     transparency = true;
                                 }
-                                System.out.println(disposalMethod);
                                 byteIndex++;
                                 // delay time
                                 int delay = ((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
@@ -134,6 +134,7 @@ public class GifExtractor {
                         break;
 
                     case 0x2c:
+
                         byteIndex++;
                         // IMAGE DESCRIPTOR
                         // 2 byte left pos

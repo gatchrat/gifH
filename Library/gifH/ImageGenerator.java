@@ -19,6 +19,7 @@ public class ImageGenerator {
     }
     public void generateImage(int[][] ColorTable, int width, int height, ArrayList<Integer> indexes,String name,int disposalMethod) {
         BufferedImage img;
+
         switch (disposalMethod) {
             case 0:
                 img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -26,7 +27,20 @@ public class ImageGenerator {
         
             default:
                 if (count != 0) {
-                    img = prevImg;
+                    //if size changed copy image and refit
+                    if(prevImg.getWidth() != width || prevImg.getHeight() != height){
+                        img =  new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                        for (int i = 0; i < Math.min(width,prevImg.getWidth()) ; i++) {
+                            for (int j = 0; j < Math.min(height,prevImg.getHeight()) ; j++) {
+                                img.setRGB(i, j, prevImg.getRGB(i,j));
+                            }
+                        }
+                    }
+                    else{
+                        img = prevImg;
+                    }
+
+
                 }
                 else{
                     img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

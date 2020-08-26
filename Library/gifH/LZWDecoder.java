@@ -11,7 +11,6 @@ public class LZWDecoder {
     }
 
     public ArrayList<Integer> Decode(int initCode, byte[] value, int tableLength) {
-        // AB 5 Farben rip -> 2bit -> 3bit = rip
         int codeSize = initCode + 1;
         int resetCode = (int) Math.pow(2, initCode);
         int bits = value.length * 8;
