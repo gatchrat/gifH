@@ -7,11 +7,12 @@
 
 ## State:
 Can extract all Images from a gif and saves them in a folder.
-Can generate a Gif from a single Image;
+Can generate a Gif from a single Image or multiple Images.
 
 
 ## Missing:
-* packing for multiple images
+* settings when packing
+* info when unpacking
 * Transparency
 * Background
 * color size bits

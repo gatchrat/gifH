@@ -233,9 +233,9 @@ public class GifExtractor {
                         }
 
                         if (localTable) {
-                            imgG.generateImage(LocalColorTable, width, height, indexList, String.valueOf(imgIndex),disposalMethod);
+                            imgG.generateImage(LocalColorTable, localWidth, localHeight, indexList, String.valueOf(imgIndex),disposalMethod);
                         } else {
-                            imgG.generateImage(GlobalColorTable, width, height, indexList, String.valueOf(imgIndex),disposalMethod);
+                            imgG.generateImage(GlobalColorTable, localWidth, localHeight, indexList, String.valueOf(imgIndex),disposalMethod);
                         }
 
                         imgIndex++;
