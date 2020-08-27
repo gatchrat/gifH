@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 public class GifExtractor {
+    public GIFSettings importetSettings;
     public GifExtractor(byte[] gif, GIFSettings settings) {
         // HEAD
 
@@ -256,6 +257,7 @@ public class GifExtractor {
         } else {
             System.out.println("This doesnt seem to be a valid file");
         }
+        importetSettings= settings;
     }
 
     private boolean checkIfValidGif(byte[] gif) {
