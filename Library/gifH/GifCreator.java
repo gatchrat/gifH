@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 public class GifCreator {
-    public GifCreator(ArrayList<File> images, int waitTime, String name) {
+    public GifCreator(ArrayList<File> images, GIFSettings settings, String name) {
         ByteBuffer data;
 
         try {
@@ -32,17 +32,17 @@ public class GifCreator {
             data.put((byte) 'a');
             // SCREEN DESCRIPTOR
             int[] sizes = getMaxSize(images);
-            int width = sizes[0];
-            int height = sizes[1];
-            data.put(Util.intTo2Byte(width));
-            data.put(Util.intTo2Byte(height));
+            settings.width = sizes[0];
+            settings.height = sizes[1];
+            data.put(Util.intTo2Byte(settings.width));
+            data.put(Util.intTo2Byte(settings.height));
             stream.write(data.array());
 
             byte[] empty = new byte[1];
             BitSet screenDescriptor = BitSet.valueOf(empty);
             boolean globalTable = false;
             screenDescriptor.set(7 - 0, globalTable);
-            int colorresolution = 7;
+            int colorresolution = settings.colorResolution;
             //1-3 Colorresolution
             if (colorresolution >= 4) {
                 screenDescriptor.set(7 - 1, true);
@@ -66,7 +66,6 @@ public class GifCreator {
             while (Util.log2(globalTableSize) != Math.floor(Util.log2(globalTableSize))) {
                 globalTableSize++;
             }
-            System.out.println("New Global Table size is " + globalTableSize);
             int globalTableBits = (int) Util.log2(globalTableSize) - 1;
             if (globalTableBits >= 4) {
                 screenDescriptor.set(7 - 5, true);
@@ -115,7 +114,7 @@ public class GifCreator {
                 graphicControlExtension[2] = (byte) 0x04;
                 //packed field
                 BitSet GCEBitset = new BitSet(8);
-                int disposalMethod = 0;
+                int disposalMethod = settings.disposalMethod;
                 if (disposalMethod >= 4) {
                     GCEBitset.set(7 - 3, true);
                     disposalMethod -= 4;
@@ -133,7 +132,7 @@ public class GifCreator {
                     graphicControlExtension[3] = GCEBitset.toByteArray()[0];
                 }
                 //delay time
-                int delayTime = 10;
+                int delayTime = settings.delayTime;
                 graphicControlExtension[4] = Util.intTo2Byte(delayTime)[0];
                 graphicControlExtension[5] = Util.intTo2Byte(delayTime)[1];
                 //transparent color index
@@ -256,21 +255,6 @@ public class GifCreator {
         }
 
 
-        return c;
-    }
-
-    Color[][] getColorData(File file) throws IOException {
-        BufferedImage image = ImageIO.read(file);
-        int height = image.getHeight();
-        int width = image.getWidth();
-        Color[][] c = new Color[width][height];
-
-
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                c[col][row] = new Color(image.getRGB(col, row));
-            }
-        }
         return c;
     }
 

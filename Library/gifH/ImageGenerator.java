@@ -17,10 +17,10 @@ public class ImageGenerator {
     public ImageGenerator(){
 
     }
-    public void generateImage(int[][] ColorTable, int width, int height, ArrayList<Integer> indexes,String name,int disposalMethod) {
+    public void generateImage(int[][] ColorTable, int width, int height, ArrayList<Integer> indexes,String name,GIFSettings settings) {
         BufferedImage img;
 
-        switch (disposalMethod) {
+        switch (settings.disposalMethod) {
             //Replace all
             case 0:
                 img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

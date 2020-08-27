@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 public class GifExtractor {
-    public GifExtractor(byte[] gif) {
+    public GifExtractor(byte[] gif, GIFSettings settings) {
         // HEAD
 
         if (checkIfValidGif(gif)) {
-            System.out.println("The Version is:" + (char) gif[3] + (char) gif[4] + (char) gif[5]);
-            int width = ((gif[7] & 0xff) << 8) | (gif[6] & 0xff);
-            int height = ((gif[9] & 0xff) << 8) | (gif[8] & 0xff);
-            System.out.println("Image is " + width + "x" + height);
+            settings.version = "" + (char)gif[3] + (char)gif[4] + (char)gif[5];
+            settings.width = ((gif[7] & 0xff) << 8) | (gif[6] & 0xff);
+            settings.height = ((gif[9] & 0xff) << 8) | (gif[8] & 0xff);
+            System.out.println("Image is " + settings.width + "x" + settings.height);
             // SCREEN DESCRIPTOR
             BitSet screenDescriptor = BitSet.valueOf(new byte[] { gif[10] });
             boolean globalTable = false;
@@ -29,6 +29,7 @@ public class GifExtractor {
                 colorResolution += 1;
             }
             colorResolution += 1;
+            settings.colorResolution = colorResolution;
             // 4 = sort
             int globalTableSize = 0;
             if (globalTable) {
@@ -44,7 +45,7 @@ public class GifExtractor {
                 globalTableSize = 3 * (int) Math.pow(2, globalTableSize + 1);
                 System.out.println("A global Color Table with " + globalTableSize / 3 + " colors is being used");
             }
-            // Skippe noch 2 bytes wegen unwichtige info
+            // Skip 2 bytes
             int byteIndex = 13;
             // GLOBAL COLOR TABLE
 
@@ -56,8 +57,6 @@ public class GifExtractor {
                 }
             }
             // BLOCKS
-
-            // Suche nach image descriptor gif[byteIndex] != 0x2c
             int imgIndex = 1;
             int disposalMethod = 0;
             ImageGenerator imgG = new ImageGenerator();
@@ -94,6 +93,7 @@ public class GifExtractor {
                                 if (controlSettings.get(7 - 5)) {
                                     disposalMethod += 1;
                                 }
+                                settings.disposalMethod = disposalMethod;
                                 if (controlSettings.get(7 - 6)) {
                                     // User Input
                                 }
@@ -104,6 +104,7 @@ public class GifExtractor {
                                 byteIndex++;
                                 // delay time
                                 int delay = ((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
+                                settings.delayTime = delay;
                                 byteIndex++;
                                 byteIndex++;
                                 // transparent color index
@@ -139,8 +140,10 @@ public class GifExtractor {
                         // IMAGE DESCRIPTOR
                         // 2 byte left pos
                         byteIndex += 2;
+                        settings.leftPos.add(0);
                         // 2 byte right pos
                         byteIndex += 2;
+                        settings.rightPos.add(0);
                         int localWidth = ((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
                         byteIndex += 2;
                         int localHeight = ((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
@@ -209,7 +212,7 @@ public class GifExtractor {
                         byte[] imageData = new byte[size];
                         int index = 0;
                         while (gif[byteIndex] != 0) {
-                            // blocksize gucken
+                            // blocksize
                             int curSize = gif[byteIndex] & 0xff;
 
                             byteIndex++;
@@ -234,9 +237,9 @@ public class GifExtractor {
                         }
 
                         if (localTable) {
-                            imgG.generateImage(LocalColorTable, localWidth, localHeight, indexList, String.valueOf(imgIndex),disposalMethod);
+                            imgG.generateImage(LocalColorTable, localWidth, localHeight, indexList, String.valueOf(imgIndex),settings);
                         } else {
-                            imgG.generateImage(GlobalColorTable, localWidth, localHeight, indexList, String.valueOf(imgIndex),disposalMethod);
+                            imgG.generateImage(GlobalColorTable, localWidth, localHeight, indexList, String.valueOf(imgIndex),settings);
                         }
 
                         imgIndex++;
