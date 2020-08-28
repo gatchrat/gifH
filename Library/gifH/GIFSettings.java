@@ -17,6 +17,7 @@ public class GIFSettings {
     public int disposalMethod = 0;
     public int delayTime = 10;
     public  boolean hasTransparency = false;
+    public boolean isInterlaced = false;
     public int transparencyIndex;
     public int backgroundIndex = 0;
     //For each image

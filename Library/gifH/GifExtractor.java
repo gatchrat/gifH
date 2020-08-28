@@ -173,13 +173,12 @@ public class GifExtractor {
                         BitSet imageDescriptor = BitSet.valueOf(new byte[] { gif[byteIndex] });
                         byteIndex += 1;
                         boolean localTable = false;
-                        boolean interlace = false;
                         if (imageDescriptor.get(7 - 0)) {
                             localTable = true;
 
                         }
                         if (imageDescriptor.get(7 - 1)) {
-                            interlace = true;
+                            settings.isInterlaced = true;
                             System.out.println("The image is interlaced");
                         }
                         if (imageDescriptor.get(7 - 2)) {
