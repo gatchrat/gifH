@@ -7,6 +7,7 @@ public class GIFSettings {
     public String version = "89a";
     public int colorResolution = 7;
     public String comment = "";
+    public String application = "";
     public String applicationData = "";
 
     //width and height of the finished GIF

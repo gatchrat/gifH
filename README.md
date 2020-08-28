@@ -11,6 +11,5 @@ Can generate a Gif from a single Image or multiple Images, using the specified s
 
 
 ## Missing:
-* application data
 * Interlacing
 * Documentation

@@ -107,7 +107,28 @@ public class GifExtractor {
                             case (byte) 0xff:
                             System.out.println("A");
                                 // Application
-                                byteIndex += 14;
+                                byteIndex++;
+                                //size
+                                byteIndex++;
+                                for (int i = 0; i <8 ; i++) {
+                                    settings.application+= (char)gif[byteIndex];
+                                    byteIndex++;
+                                }
+                                byteIndex+=3;
+                                // data
+                                while (gif[byteIndex] != 0x00 ) {
+                                    int size = gif[byteIndex];
+                                    byteIndex++;
+                                    for (int i = 0; i <size ; i++) {
+                                        settings.applicationData+= (char)gif[byteIndex];
+                                        byteIndex++;
+                                    }
+
+                                }
+                                // ending
+                                byteIndex++;
+                                System.out.println("Application:" + settings.application);
+                                System.out.println("Data:" + settings.applicationData);
                                 break;
                             case (byte) 0xfe:
 

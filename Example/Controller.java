@@ -48,7 +48,6 @@ public class Controller {
         for (File f : cf) {
             images.add( f);
         }
-        settings.applicationData = applicationField.getText();
         settings.comment = commentField.getText();
         settings.disposalMethod = Integer.parseInt(disposalField.getText());
         settings.delayTime = Integer.parseInt(timeField.getText());
@@ -71,7 +70,7 @@ public class Controller {
         widthField.setText(String.valueOf(settings.width));
         heightField.setText(String.valueOf(settings.height));
         versionField.setText(settings.version);
-        applicationField.setText(settings.applicationData);
+        applicationField.setText(settings.application);
         commentField.setText(settings.comment);
         disposalField.setText(String.valueOf(settings.disposalMethod));
         timeField.setText(String.valueOf(settings.delayTime));

@@ -40,7 +40,7 @@
             <TextField fx:id="timeField" text="10" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <TextField fx:id="widthField" editable="false" GridPane.columnIndex="3" />
             <TextField fx:id="heightField" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-            <TextField fx:id="applicationField" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <TextField fx:id="applicationField" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
             <TextField fx:id="versionField" GridPane.columnIndex="3" GridPane.rowIndex="3" />
          </children>
          <padding>
