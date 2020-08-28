@@ -73,7 +73,6 @@ public class GifExtractor {
                                 byteIndex++;
                                 // settings
                                 BitSet controlSettings = BitSet.valueOf(new byte[] { gif[byteIndex] });
-                                System.out.println(controlSettings.toString());
                                 disposalMethod = 0;
                                 if (controlSettings.get(7 - 3)) {
                                     disposalMethod += 4;
@@ -111,15 +110,22 @@ public class GifExtractor {
                                 byteIndex += 14;
                                 break;
                             case (byte) 0xfe:
-                            System.out.println("C");
+
                                 // Comment
                                 byteIndex++;
                                 // data
                                 while (gif[byteIndex] != 0x00 ) {
+                                    int size = gif[byteIndex];
                                     byteIndex++;
+                                    for (int i = 0; i <size ; i++) {
+                                        settings.comment+= (char)gif[byteIndex];
+                                        byteIndex++;
+                                    }
+
                                 }
                                 // ending
                                 byteIndex++;
+                                System.out.println("Comment found:" + settings.comment);
                                 break;
 
                             default:
@@ -201,7 +207,6 @@ public class GifExtractor {
                         }
                         byteIndex = oldIndex;
 
-                        // System.out.println("Image Data size is " + size + "bytes");
                         byte[] imageData = new byte[size];
                         int index = 0;
                         while (gif[byteIndex] != 0) {

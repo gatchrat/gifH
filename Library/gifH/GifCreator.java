@@ -104,7 +104,40 @@ public class GifCreator {
                 stream.write(globalTableBytes);
             }
             //Custom Comment
+            if(settings.comment!= ""){
+                char[] chars = settings.comment.toCharArray();
+                byte[] comment = new byte[(int) (4+chars.length+Math.ceil(chars.length/255))];
+                comment[0] = 0x21;
+                comment[1] = (byte) 0xfe;
+                comment[comment.length-1] = 0x00;
+                int remainingChars = chars.length;
+                int cIndex = 0;
+                int bIndex = 2;
 
+                while (remainingChars > 0 ){
+                    int count;
+
+                    if(remainingChars > 255){
+                        remainingChars-=255;
+                        count = 255;
+                        comment[bIndex] = (byte) 255;
+                        bIndex++;
+                    }
+                    else{
+                        comment[bIndex] = (byte) remainingChars;
+                        count = remainingChars;
+                        remainingChars = 0;
+                        bIndex++;
+                    }
+
+                    for (int i = 0; i <count ; i++) {
+                        comment[bIndex] = (byte) chars[cIndex];
+                        bIndex++;
+                        cIndex++;
+                    }
+                }
+                stream.write(comment);
+            }
             //LOOP
             for (File f : images) {
                 //Graphic Control Extension
