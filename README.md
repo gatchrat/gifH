@@ -1,6 +1,7 @@
 # gifH
 gifH is a simple Java-Library, which can be used to create .gif Files from single images, or extract images from .gif files.
 It supports a big array of settings and can extract a multitude of information from a Gif.
+After the of the Gif 89a [specification](https://www.w3.org/Graphics/GIF/spec-gif89a.txt)
 
 ## Example-Usage:
 1. Combine the Files 1.png and 2.png in the input folder into test.gif. The Comment "Created with GifH" will be added and there will 100*10ms delay between the single images.
