@@ -15,9 +15,12 @@ public class GIFSettings {
 
     public int disposalMethod = 0;
     public int delayTime = 10;
+    public  boolean hasTransparency = false;
+    public int transparencyIndex;
+    public int backgroundIndex = 0;
     //For each image
-    public ArrayList<Integer> leftPos = new ArrayList<Integer>();
-    public ArrayList<Integer> rightPos = new ArrayList<Integer>();
+    public int leftPos = 0;
+    public int  topPos =0;
     public GIFSettings(){
 
     }

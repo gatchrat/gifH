@@ -6,14 +6,12 @@
 3. Use
 
 ## State:
-Can extract all Images from a gif and saves them in a folder.
-Can generate a Gif from a single Image or multiple Images.
+Can extract all Images from a gif and saves them in a folder, returning any found info.
+Can generate a Gif from a single Image or multiple Images, using the specified settings.
 
 
 ## Missing:
-* settings when packing
-* info when unpacking
-* Transparency
-* Background
-* Disposal Methods (2-4) (Currently all implemented as method 1 )
+* comment
+* application data
+* Interlacing
 * Documentation

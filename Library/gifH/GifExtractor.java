@@ -46,7 +46,7 @@ public class GifExtractor {
                 globalTableSize = 3 * (int) Math.pow(2, globalTableSize + 1);
                 System.out.println("A global Color Table with " + globalTableSize / 3 + " colors is being used");
             }
-            // Skip 2 bytes
+            settings.backgroundIndex = gif[11];
             int byteIndex = 13;
             // GLOBAL COLOR TABLE
 
@@ -74,17 +74,7 @@ public class GifExtractor {
                                 // settings
                                 BitSet controlSettings = BitSet.valueOf(new byte[] { gif[byteIndex] });
                                 System.out.println(controlSettings.toString());
-                                boolean transparency = false;
                                 disposalMethod = 0;
-                                if (controlSettings.get(7 - 0)) {
-                                    // reserved
-                                }
-                                if (controlSettings.get(7 - 1)) {
-                                    // reserved;
-                                }
-                                if (controlSettings.get(7 - 2)) {
-                                    // reserved
-                                }
                                 if (controlSettings.get(7 - 3)) {
                                     disposalMethod += 4;
                                 }
@@ -99,8 +89,7 @@ public class GifExtractor {
                                     // User Input
                                 }
                                 if (controlSettings.get(7 - 7)) {
-                                    // transparency
-                                    transparency = true;
+                                    settings.hasTransparency = true;
                                 }
                                 byteIndex++;
                                 // delay time
@@ -110,6 +99,9 @@ public class GifExtractor {
                                 byteIndex++;
                                 // transparent color index
                                 byteIndex++;
+                                if(settings.hasTransparency){
+                                    settings.transparencyIndex = gif[byteIndex];
+                                }
                                 // terminator
                                 byteIndex++;
                                 break;
@@ -140,11 +132,11 @@ public class GifExtractor {
                         byteIndex++;
                         // IMAGE DESCRIPTOR
                         // 2 byte left pos
+                        settings.leftPos=((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
                         byteIndex += 2;
-                        settings.leftPos.add(0);
                         // 2 byte right pos
+                        settings.topPos=((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
                         byteIndex += 2;
-                        settings.rightPos.add(0);
                         int localWidth = ((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
                         byteIndex += 2;
                         int localHeight = ((gif[byteIndex + 1] & 0xff) << 8) | (gif[byteIndex] & 0xff);
